@@ -9,7 +9,7 @@ export default function CreateRoom() {
   const handleCreate = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:5000/api/rooms", {
+      const res = await fetch("http://localhost:5000/api/rooms/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -19,9 +19,10 @@ export default function CreateRoom() {
       });
       const data = await res.json();
       if (!res.ok) return setMessage(data.message || "Error creating room");
-      setMessage(`✅ Room created! Invite code: ${data.inviteCode}`);
+      setMessage(`✅ Room created! Invite code: ${data.room.inviteCode}`);
       setRoomName("");
     } catch (err) {
+      console.error(err);
       setMessage("Server error");
     }
   };

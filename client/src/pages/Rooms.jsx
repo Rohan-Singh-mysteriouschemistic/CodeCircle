@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext"; // ✅ Import your auth hook
+import { useAuth } from "../context/AuthContext";
 
 export default function Rooms() {
   const [rooms, setRooms] = useState([]);
-  const { token } = useAuth(); // ✅ get token from context
+  const { token } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -12,7 +12,7 @@ export default function Rooms() {
 
     fetch("http://localhost:5000/api/rooms/my-rooms", {
       headers: {
-        Authorization: `Bearer ${token}`, // ✅ use token from context
+        Authorization: `Bearer ${token}`,
       },
     })
       .then((res) => res.json())
@@ -38,12 +38,20 @@ export default function Rooms() {
               </p>
 
               <div className="mt-3 flex gap-3">
-                {/* ✅ navigate to that room's leaderboard */}
+                {/* ✅ Go to leaderboard */}
                 <button
                   onClick={() => navigate(`/leaderboard/${room._id}`)}
                   className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded"
                 >
                   View Leaderboard
+                </button>
+
+                {/* ✅ Go to chat */}
+                <button
+                  onClick={() => navigate(`/rooms/${room._id}/chat`)}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded"
+                >
+                  Open Chat
                 </button>
               </div>
             </div>

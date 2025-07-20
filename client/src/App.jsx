@@ -11,6 +11,7 @@ import Rooms from "./pages/Rooms.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import ProfilePage from "./pages/ProfilePage";
 import Leaderboard from "./pages/Leaderboard.jsx";
+import RoomChat from "./pages/RoomChat.jsx";
 
 export default function App() {
   return (
@@ -68,6 +69,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <Leaderboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/rooms/:roomId/chat"
+          element={
+            <ProtectedRoute>
+              <RoomChat />
             </ProtectedRoute>
           }
         />

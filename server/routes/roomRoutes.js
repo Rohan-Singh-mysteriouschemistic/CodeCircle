@@ -3,6 +3,7 @@ import Room from "../models/Room.js";
 import generateInviteCode from "../utils/generateInviteCode.js";
 import protect from "../middleware/authMiddleware.js";
 import User from "../models/User.js";
+import Channels from "../models/Channels.js";
 
 const roomRoute = express.Router();
 
@@ -80,5 +81,16 @@ roomRoute.get("/my-rooms", protect, async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+
+// GET /api/rooms/:roomId/channels
+roomRoute.get("/:roomId/channels", protect, async (req, res) => {
+  const room = await Room.findById(req.params.roomId);
+  if (!room) return res.status(404).json({ message: "Room not found" });
+
+  // Assuming you have a Channel model related to Room
+  const channels = await Channels.find({ room: req.params.roomId });
+  res.json({ channels });
+});
+
 
 export default roomRoute;
