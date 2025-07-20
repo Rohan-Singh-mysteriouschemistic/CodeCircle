@@ -1,0 +1,34 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-black text-white overflow-hidden;
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(90deg,#9D4EDD,#3BE8B0);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 6px rgba(157,78,221,0.4); /* very subtle */
+}
+
+@keyframes glow {
+  0% { text-shadow: 0 0 8px #9D4EDD, 0 0 16px #3BE8B0; }
+  100% { text-shadow: 0 0 20px #3BE8B0, 0 0 40px #9D4EDD; }
+}
+
+/* floating particles */
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  animation: float 10s linear infinite;
+}
+
+@keyframes float {
+  0% { transform: translateY(0) translateX(0); opacity:0.3;}
+  50% { transform: translateY(-20px) translateX(10px); opacity:0.8;}
+  100% { transform: translateY(0) translateX(0); opacity:0.3;}
+}
