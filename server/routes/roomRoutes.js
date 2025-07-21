@@ -26,6 +26,7 @@ roomRoute.post("/create", protect, async (req, res) => {
       inviteCode: code,
       createdBy: req.user.id,
       members: [req.user.id],
+      admins: [req.user.id],
     });
 
     res.status(201).json({
@@ -78,6 +79,20 @@ roomRoute.get("/my-rooms", protect, async (req, res) => {
     res.json({ rooms });
   } catch (err) {
     console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// ✅ Get a specific room details (including admins)
+roomRoute.get("/:roomId", protect, async (req, res) => {
+  try {
+    const room = await Room.findById(req.params.roomId);
+    if (!room) {
+      return res.status(404).json({ message: "Room not found" });
+    }
+    res.json(room);
+  } catch (err) {
+    console.error("Error fetching room:", err);
     res.status(500).json({ message: "Server error" });
   }
 });

@@ -22,7 +22,10 @@ const userSchema = new mongoose.Schema(
     contestRating: { type: Number, default: 0 },
     globalRank: { type: Number, default: null },
     contestsAttended: { type: Number, default: 0 },
-
+    badges: {
+      winner: { type: Number, default: 0 },
+      second: { type: Number, default: 0 },
+    },
   },
   { timestamps: true }
 );

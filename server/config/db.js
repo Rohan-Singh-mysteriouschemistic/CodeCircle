@@ -6,7 +6,7 @@ const connectDB = async () => {
     mongoose.connection.on('connected', () => {
       console.log('Database Connected');
     });
-    await mongoose.connect(`${process.env.MONGO_URI}/codespace`);
+    await mongoose.connect(`${process.env.MONGO_URI}/CodeCircle`);
   } catch (err) {
     console.log(err.message);
     process.exit(1);

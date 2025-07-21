@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+
+// tailwind.config.js
 module.exports = {
   content: [
     "./index.html",
@@ -7,11 +9,8 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        neonPurple: '#9D4EDD',
-        neonBlue: '#3BE8B0',
-      },
-      boxShadow: {
-        neon: '0 0 20px #9D4EDD, 0 0 40px #3BE8B0',
+        primary: '#6366f1',
+        accent: '#ec4899',
       },
     },
   },

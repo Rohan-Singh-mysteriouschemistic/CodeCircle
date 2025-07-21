@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Code, Users, MessageSquare, Trophy } from "lucide-react";
 
 export default function Rooms() {
   const [rooms, setRooms] = useState([]);
@@ -21,43 +24,70 @@ export default function Rooms() {
   }, [token]);
 
   return (
-    <div className="p-8 text-white">
-      <h1 className="text-3xl font-bold mb-6">🛏️ My Rooms</h1>
-      {rooms.length === 0 ? (
-        <p>You haven't joined any rooms yet.</p>
-      ) : (
-        <div className="grid gap-4">
-          {rooms.map((room) => (
-            <div
-              key={room._id}
-              className="p-4 rounded-lg bg-gray-800 border border-gray-700 shadow-lg"
-            >
-              <h2 className="text-xl font-semibold">{room.name}</h2>
-              <p className="text-sm text-gray-400">
-                Invite Code: {room.inviteCode}
-              </p>
-
-              <div className="mt-3 flex gap-3">
-                {/* ✅ Go to leaderboard */}
-                <button
-                  onClick={() => navigate(`/leaderboard/${room._id}`)}
-                  className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded"
-                >
-                  View Leaderboard
-                </button>
-
-                {/* ✅ Go to chat */}
-                <button
-                  onClick={() => navigate(`/rooms/${room._id}/chat`)}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded"
-                >
-                  Open Chat
-                </button>
-              </div>
-            </div>
-          ))}
+    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 text-gray-100">
+      {/* Hero Section */}
+      <section className="relative py-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl"></div>
+        <div className="relative max-w-4xl mx-auto text-center">
+          <h1 className="text-4xl md:text-6xl font-bold mb-6">Your <span className="gradient-text">Rooms</span></h1>
+          <p className="text-lg text-gray-400 max-w-2xl mx-auto">
+            Here are the rooms you’ve joined or created. View leaderboards, chat with friends, or check contest results.
+          </p>
         </div>
-      )}
+      </section>
+
+      {/* Rooms Grid */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          {rooms.length === 0 ? (
+            <div className="text-center text-gray-400 text-lg">
+              You haven’t joined any rooms yet. Join or create a room to get started!
+            </div>
+          ) : (
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {rooms.map((room) => (
+                <Card
+                  key={room._id}
+                  className="bg-gray-800/50 backdrop-blur border border-gray-700 hover:shadow-purple-500/20 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between"
+                >
+                  <CardHeader>
+                    <CardTitle className="text-xl font-semibold flex items-center">
+                      <Users className="h-6 w-6 mr-2 text-purple-400" />
+                      {room.name}
+                    </CardTitle>
+                    <CardDescription className="text-gray-400">
+                      Invite Code: {room.inviteCode}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="mt-auto space-y-3">
+                    <Button
+                      onClick={() => navigate(`/leaderboard/${room._id}`)}
+                      className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+                    >
+                      <Trophy className="h-4 w-4 mr-2" />
+                      View Leaderboard
+                    </Button>
+                    <Button
+                      onClick={() => navigate(`/rooms/${room._id}/chat`)}
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      <MessageSquare className="h-4 w-4 mr-2" />
+                      Open Chat
+                    </Button>
+                    <Button
+                      onClick={() => navigate(`/room/${room._id}/results`)}
+                      className="w-full bg-green-600 hover:bg-green-700 text-white"
+                    >
+                      🏅 Results
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
     </div>
   );
 }
