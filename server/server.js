@@ -4,6 +4,8 @@ import app from "./app.js";
 import http from "http";
 import { Server } from "socket.io";
 import Message from "./models/Message.js";
+import Contest from "./models/Contest.js";
+import User from "./models/User.js";
 
 // ✅ Connect to MongoDB
 connectDB();
@@ -36,7 +38,6 @@ io.on("connection", (socket) => {
       console.warn("⚠️ joinChannel missing roomId or channelId");
       return;
     }
-    // Join this socket to a specific channel room
     socket.join(channelId);
     console.log(`➡️ Socket ${socket.id} joined channel ${channelId} (room: ${roomId})`);
   });
@@ -50,7 +51,6 @@ io.on("connection", (socket) => {
         return;
       }
 
-      // ✅ Save message in database
       const newMsg = await Message.create({
         text,
         sender,
@@ -58,10 +58,8 @@ io.on("connection", (socket) => {
         channelId,
       });
 
-      // ✅ Populate sender info if needed
       const populatedMsg = await newMsg.populate("sender", "username");
 
-      // ✅ Broadcast message to everyone in this channel
       io.to(channelId).emit("receiveMessage", {
         _id: populatedMsg._id,
         text: populatedMsg.text,
@@ -82,6 +80,55 @@ io.on("connection", (socket) => {
     console.log(`❌ Socket disconnected: ${socket.id}`);
   });
 });
+
+// ======================
+// 📌 Auto-finish contests
+// ======================
+
+// Helper to award badges and mark finished
+async function finishContest(contest) {
+  // Already finished? skip
+  if (contest.finished) return;
+
+  // Sort participants by solved count (desc)
+  const sorted = [...contest.participants].sort((a, b) => b.solved - a.solved);
+
+  const first = sorted[0];
+  const second = sorted[1];
+
+  if (first?.user) {
+    await User.findByIdAndUpdate(first.user, { $inc: { "badges.winner": 1 } });
+  }
+  if (second?.user) {
+    await User.findByIdAndUpdate(second.user, { $inc: { "badges.second": 1 } });
+  }
+
+  // assign ranks
+  contest.participants.forEach((p, idx) => {
+    p.rank = idx + 1;
+  });
+
+  contest.finished = true;
+  await contest.save();
+  console.log(`✅ Contest ${contest._id} auto-finished and badges updated`);
+}
+
+// Check every 1 minute
+setInterval(async () => {
+  try {
+    const now = new Date();
+    const toFinish = await Contest.find({
+      endTime: { $lte: now },
+      finished: { $ne: true },
+    });
+
+    for (const c of toFinish) {
+      await finishContest(c);
+    }
+  } catch (err) {
+    console.error("⛔ Error in auto-finish interval:", err);
+  }
+}, 60 * 1000);
 
 // ======================
 // 📌 Start server

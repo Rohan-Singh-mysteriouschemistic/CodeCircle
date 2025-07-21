@@ -27,7 +27,6 @@ export default function RoomChat() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [activeContest, setActiveContest] = useState(null);
 
-  // MOBILE menu state
   const [openSidebar, setOpenSidebar] = useState(false);
 
   // fetch channels & admin
@@ -187,8 +186,12 @@ export default function RoomChat() {
         body: JSON.stringify({ problemIndex }),
       });
       const data = await res.json();
-      if (res.ok) alert("✅ Marked as solved!");
-      else alert(data.message || "❌ Failed to mark solved");
+      if (res.ok) {
+        alert("✅ Marked as solved!");
+        setActiveContest(data.contest); // update solved state
+      } else {
+        alert(data.message || "❌ Failed to mark solved");
+      }
     } catch (err) {
       console.error(err);
     }
@@ -196,7 +199,7 @@ export default function RoomChat() {
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 text-gray-100">
-      {/* Sidebar (desktop) */}
+      {/* ✅ SIDEBAR */}
       <div className="hidden md:flex w-64 bg-gray-800/60 backdrop-blur border-r border-gray-700 p-4 flex-col">
         <h2 className="text-xl font-bold mb-4">📂 Channels</h2>
         <ul className="space-y-2 flex-1 overflow-y-auto">
@@ -239,14 +242,11 @@ export default function RoomChat() {
         )}
       </div>
 
-      {/* Chat main area */}
+      {/* ✅ Main Chat Area */}
       <div className="flex-1 flex flex-col">
-        {/* Top bar on mobile */}
+        {/* mobile top bar */}
         <div className="md:hidden flex justify-between items-center p-3 border-b border-gray-700 bg-gray-900">
-          <button
-            className="text-white"
-            onClick={() => setOpenSidebar(true)}
-          >
+          <button className="text-white" onClick={() => setOpenSidebar(true)}>
             <Menu size={28} />
           </button>
           <h2 className="text-lg font-bold truncate">
@@ -254,6 +254,7 @@ export default function RoomChat() {
           </h2>
         </div>
 
+        {/* conditional render */}
         {!selectedChannel ? (
           <div className="p-6">
             <h1 className="text-3xl font-bold mb-6">Welcome to the Room!</h1>
@@ -261,36 +262,42 @@ export default function RoomChat() {
               <div className="bg-gray-800/60 backdrop-blur border border-gray-700 rounded-2xl p-6 shadow-lg">
                 <h2 className="text-xl font-semibold mb-2">🔥 Active Contest</h2>
                 <p className="text-sm mb-4 text-gray-300">
-                  Ends at:{" "}
-                  {new Date(activeContest.endTime).toLocaleTimeString()}
+                  Ends at: {new Date(activeContest.endTime).toLocaleTimeString()}
                 </p>
                 <ul className="list-disc pl-4 space-y-2">
-                  {activeContest.problems.map((p, idx) => (
-                    <li key={idx}>
-                      <a
-                        href={p.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-blue-400 hover:underline"
-                      >
-                        {p.title} ({p.difficulty})
-                      </a>
-                      {!isAdmin && (
-                        <button
-                          onClick={() => submitSolved(activeContest._id, idx)}
-                          className="ml-3 bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded"
+                  {activeContest.problems.map((p, idx) => {
+                    const myParticipant = activeContest.participants?.find(
+                      (pt) => pt.user._id === user.id
+                    );
+                    const isSolved = myParticipant?.solvedProblems?.includes(idx);
+                    return (
+                      <li key={idx}>
+                        <a
+                          href={p.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-blue-400 hover:underline"
                         >
-                          ✅ Mark Solved
-                        </button>
-                      )}
-                    </li>
-                  ))}
+                          {p.title} ({p.difficulty})
+                        </a>
+                        {!isAdmin && !isSolved && (
+                          <button
+                            onClick={() => submitSolved(activeContest._id, idx)}
+                            className="ml-3 bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded"
+                          >
+                            ✅ Mark Solved
+                          </button>
+                        )}
+                        {isSolved && (
+                          <span className="ml-3 text-green-400 font-semibold">✔ Solved</span>
+                        )}
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             ) : (
-              <p className="text-gray-400 italic">
-                No active contest currently.
-              </p>
+              <p className="text-gray-400 italic">No active contest currently.</p>
             )}
           </div>
         ) : (
@@ -300,9 +307,7 @@ export default function RoomChat() {
             </div>
             <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-800/30">
               {messages.length === 0 ? (
-                <div className="text-gray-400 italic">
-                  No messages yet. Start chatting 👇
-                </div>
+                <div className="text-gray-400 italic">No messages yet. Start chatting 👇</div>
               ) : (
                 <>
                   {messages.map((m, idx) => (
@@ -341,7 +346,7 @@ export default function RoomChat() {
         )}
       </div>
 
-      {/* Mobile Sidebar Overlay */}
+      {/* ✅ Mobile Sidebar Overlay */}
       {openSidebar && (
         <div className="fixed inset-0 z-50 bg-gray-900/70 backdrop-blur-2xl flex flex-col px-6 py-6">
           <div className="flex justify-between items-center mb-6">
@@ -397,7 +402,7 @@ export default function RoomChat() {
         </div>
       )}
 
-      {/* Contest Modal */}
+      {/* ✅ Contest Modal (unchanged) */}
       {showContestModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]">
           <div className="bg-gray-900 text-white p-6 rounded-2xl w-96 shadow-lg border border-gray-700">

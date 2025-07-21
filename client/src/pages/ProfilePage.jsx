@@ -13,7 +13,12 @@ export default function ProfilePage() {
     contestRating: user?.contestRating || 0,
     globalRank: user?.globalRank || null,
     contestsAttended: user?.contestsAttended || 0,
+    badges: {
+      winner: user?.badges?.winner || 0,
+      second: user?.badges?.second || 0
+    }
   });
+
 
   const handleSync = async () => {
     if (!leetCodeId.trim()) {
@@ -49,6 +54,10 @@ export default function ProfilePage() {
           contestRating: freshUser.contestRating,
           globalRank: freshUser.globalRank,
           contestsAttended: freshUser.contestsAttended,
+          badges: {
+            winner: freshUser.badges?.winner || 0,
+            second: freshUser.badges?.second || 0
+          }
         });
       }
     } catch (err) {
@@ -123,6 +132,12 @@ export default function ProfilePage() {
             <p>
               <strong>Contests Attended:</strong>{" "}
               {stats.contestsAttended}
+            </p>
+            <p>
+              <strong>🏆 1st Place Badges:</strong> {stats.badges?.winner ?? 0}
+            </p>
+            <p>
+              <strong>🥈 2nd Place Badges:</strong> {stats.badges?.second ?? 0}
             </p>
           </div>
         )}

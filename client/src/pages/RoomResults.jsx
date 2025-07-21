@@ -70,8 +70,10 @@ export default function RoomResults() {
             🏅 Contest Results
           </h1>
           <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-            See how everyone performed in{" "}
-            <span className="text-purple-400 font-semibold">{results.title}</span>.
+            See how everyone performed in the contest on{" "}
+            <span className="text-purple-400 font-semibold">
+              {new Date(results.startTime).toLocaleString()}
+            </span>.
           </p>
         </div>
       </section>
@@ -82,7 +84,7 @@ export default function RoomResults() {
           <Card className="bg-gray-800/50 backdrop-blur border border-gray-700 rounded-2xl overflow-hidden">
             <CardHeader>
               <CardTitle className="text-2xl font-semibold">
-                Results for {results.title}
+                Results for contest on {new Date(results.startTime).toLocaleString()}
               </CardTitle>
             </CardHeader>
             <CardContent className="overflow-x-auto">
@@ -95,16 +97,19 @@ export default function RoomResults() {
                   </tr>
                 </thead>
                 <tbody>
-                  {results.participants.map((p, idx) => (
-                    <tr
-                      key={p.user._id}
-                      className="border-b border-gray-700 hover:bg-gray-700/30 transition-colors"
-                    >
-                      <td className="py-3 px-4 font-medium">{idx + 1}</td>
-                      <td className="py-3 px-4">{p.user.username}</td>
-                      <td className="py-3 px-4">{p.solved}</td>
-                    </tr>
-                  ))}
+                  {Array.isArray(results.participants) &&
+                    [...results.participants]
+                      .sort((a, b) => b.solved - a.solved)
+                      .map((p, idx) => (
+                        <tr
+                          key={p.user._id}
+                          className="border-b border-gray-700 hover:bg-gray-700/30 transition-colors"
+                        >
+                          <td className="py-3 px-4 font-medium">{idx + 1}</td>
+                          <td className="py-3 px-4">{p.user.username}</td>
+                          <td className="py-3 px-4">{p.solved}</td>
+                        </tr>
+                      ))}
                 </tbody>
               </table>
             </CardContent>

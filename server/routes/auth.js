@@ -19,7 +19,7 @@ router.get("/me", async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // ✅ Send back only the needed fields
+    // ✅ Include badges in the response
     res.json({
       id: user._id,
       username: user.username,
@@ -29,6 +29,10 @@ router.get("/me", async (req, res) => {
       contestRating: user.contestRating || 0,
       globalRank: user.globalRank || null,
       contestsAttended: user.contestsAttended || 0,
+      badges: {
+        winner: user.badges?.winner || 0,
+        second: user.badges?.second || 0,
+      },
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     });
