@@ -10,7 +10,7 @@ const HeroSection = () => {
 
   const handleJoinRoomClick = () => {
     if (user) {
-      navigate("/rooms");
+      navigate("/join-room");
     } else {
       navigate("/login");
     }

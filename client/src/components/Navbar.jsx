@@ -1,23 +1,24 @@
+import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { Code } from "lucide-react";
+import { Code, Menu, X } from "lucide-react";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [openMenu, setOpenMenu] = useState(false);
 
   const handleScroll = (id) => {
     if (location.pathname !== "/") {
-      // Navigate to home first, then scroll after a short delay
       navigate("/");
       setTimeout(() => {
         document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
       }, 100);
     } else {
-      // Already on home, just scroll
       document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
     }
+    setOpenMenu(false);
   };
 
   const navLinks = user
@@ -33,11 +34,15 @@ export default function Navbar() {
       ];
 
   return (
-    <nav className="fixed top-0 left-0 w-full z-50 backdrop-blur-lg bg-gray-900/70 shadow-md border-b border-white/10">
-      <div className="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
+    <nav className="fixed top-0 left-0 w-full z-50">
+      {/* Top Bar */}
+      <div className="px-6 py-3 flex justify-between items-center backdrop-blur-lg bg-gray-900/70 shadow-md border-b border-white/10 w-full">
         {/* Logo */}
         <span
-          onClick={() => navigate("/")}
+          onClick={() => {
+            navigate("/");
+            setOpenMenu(false);
+          }}
           className="flex items-center gap-2 text-white font-bold text-xl cursor-pointer"
         >
           <div className="p-1 rounded-lg bg-gradient-to-br from-[#9D4EDD] to-[#3BE8B0]">
@@ -46,7 +51,7 @@ export default function Navbar() {
           <span className="tracking-tight">CodeCircle</span>
         </span>
 
-        {/* Links */}
+        {/* Desktop Links */}
         <div className="hidden md:flex items-center gap-6">
           {navLinks.map((link) =>
             link.to.startsWith("#") ? (
@@ -61,7 +66,10 @@ export default function Navbar() {
             ) : (
               <span
                 key={link.name}
-                onClick={() => navigate(link.to)}
+                onClick={() => {
+                  navigate(link.to);
+                  setOpenMenu(false);
+                }}
                 className={`cursor-pointer text-white relative group transition duration-300 ${
                   location.pathname === link.to
                     ? "font-semibold"
@@ -75,8 +83,8 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Auth Buttons */}
-        <div className="flex gap-3 items-center">
+        {/* Auth Buttons - Desktop */}
+        <div className="hidden md:flex gap-3 items-center">
           {!user ? (
             <>
               <button
@@ -100,6 +108,89 @@ export default function Navbar() {
               Logout
             </button>
           )}
+        </div>
+
+        {/* Hamburger Icon - Mobile */}
+        <button
+          className="md:hidden text-white"
+          onClick={() => setOpenMenu(!openMenu)}
+        >
+          {openMenu ? <X size={28} /> : <Menu size={28} />}
+        </button>
+      </div>
+
+      {/* Mobile Menu */}
+      <div
+        className={`md:hidden fixed top-[64px] left-0 w-full h-[calc(100vh-64px)] transition-all duration-500 ease-in-out ${
+          openMenu ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        }`}
+      >
+        <div className="w-full h-full bg-gray-900/60 backdrop-blur-2xl flex flex-col justify-between px-8 py-10">
+          {/* Links */}
+          <div className="flex-1 overflow-y-auto flex flex-col gap-6">
+            {navLinks.map((link) =>
+              link.to.startsWith("#") ? (
+                <button
+                  key={link.name}
+                  onClick={() => handleScroll(link.to.substring(1))}
+                  className="text-white text-left text-xl font-medium opacity-90 hover:opacity-100 transition"
+                >
+                  {link.name}
+                </button>
+              ) : (
+                <button
+                  key={link.name}
+                  onClick={() => {
+                    navigate(link.to);
+                    setOpenMenu(false);
+                  }}
+                  className={`text-left text-xl font-medium transition ${
+                    location.pathname === link.to
+                      ? "text-white font-semibold"
+                      : "text-white opacity-90 hover:opacity-100"
+                  }`}
+                >
+                  {link.name}
+                </button>
+              )
+            )}
+          </div>
+
+          {/* Auth Buttons pinned to bottom */}
+          <div className="flex flex-col gap-3 border-t border-white/20 pt-6">
+            {!user ? (
+              <>
+                <button
+                  onClick={() => {
+                    navigate("/login");
+                    setOpenMenu(false);
+                  }}
+                  className="px-4 py-2 rounded-lg border border-white/30 text-white hover:border-[#9D4EDD] hover:text-[#9D4EDD] transition-all duration-300"
+                >
+                  Login
+                </button>
+                <button
+                  onClick={() => {
+                    navigate("/register");
+                    setOpenMenu(false);
+                  }}
+                  className="px-4 py-2 rounded-lg bg-gradient-to-r from-[#9D4EDD] to-[#3BE8B0] text-white font-semibold hover:opacity-90 transition-all duration-300"
+                >
+                  Register
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => {
+                  logout();
+                  setOpenMenu(false);
+                }}
+                className="px-4 py-2 rounded-lg border border-white/20 text-white hover:bg-red-600 hover:text-white transition-all duration-300"
+              >
+                Logout
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </nav>

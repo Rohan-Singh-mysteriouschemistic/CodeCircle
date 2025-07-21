@@ -23,7 +23,7 @@ export default function App() {
   const noFooterRoutes = ["/login", "/register"];
   const isRoomChat = location.pathname.startsWith("/rooms/") && location.pathname.endsWith("/chat");
 
-  const hideNavbar = noNavbarRoutes.includes(location.pathname);
+  const hideNavbar = noNavbarRoutes.includes(location.pathname) || isRoomChat;
   const hideFooter = noFooterRoutes.includes(location.pathname) || isRoomChat;
 
   return (

@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { Menu, X } from "lucide-react";
 import io from "socket.io-client";
 
 const socket = io("http://localhost:5000");
@@ -25,6 +26,9 @@ export default function RoomChat() {
   ]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [activeContest, setActiveContest] = useState(null);
+
+  // MOBILE menu state
+  const [openSidebar, setOpenSidebar] = useState(false);
 
   // fetch channels & admin
   useEffect(() => {
@@ -192,8 +196,8 @@ export default function RoomChat() {
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 text-gray-100">
-      {/* Sidebar */}
-      <div className="w-64 bg-gray-800/60 backdrop-blur border-r border-gray-700 p-4 flex flex-col">
+      {/* Sidebar (desktop) */}
+      <div className="hidden md:flex w-64 bg-gray-800/60 backdrop-blur border-r border-gray-700 p-4 flex-col">
         <h2 className="text-xl font-bold mb-4">📂 Channels</h2>
         <ul className="space-y-2 flex-1 overflow-y-auto">
           {channels.map((ch) => (
@@ -210,7 +214,6 @@ export default function RoomChat() {
             </li>
           ))}
         </ul>
-
         <form onSubmit={createChannel} className="mt-4 space-y-2">
           <input
             type="text"
@@ -226,7 +229,6 @@ export default function RoomChat() {
             ➕ Add Channel
           </button>
         </form>
-
         {isAdmin && (
           <button
             onClick={() => setShowContestModal(true)}
@@ -237,8 +239,21 @@ export default function RoomChat() {
         )}
       </div>
 
-      {/* Main area */}
+      {/* Chat main area */}
       <div className="flex-1 flex flex-col">
+        {/* Top bar on mobile */}
+        <div className="md:hidden flex justify-between items-center p-3 border-b border-gray-700 bg-gray-900">
+          <button
+            className="text-white"
+            onClick={() => setOpenSidebar(true)}
+          >
+            <Menu size={28} />
+          </button>
+          <h2 className="text-lg font-bold truncate">
+            {selectedChannel ? `# ${selectedChannel.name}` : "Room"}
+          </h2>
+        </div>
+
         {!selectedChannel ? (
           <div className="p-6">
             <h1 className="text-3xl font-bold mb-6">Welcome to the Room!</h1>
@@ -280,7 +295,7 @@ export default function RoomChat() {
           </div>
         ) : (
           <>
-            <div className="p-4 border-b border-gray-700 bg-gray-900 text-xl font-bold">
+            <div className="hidden md:block p-4 border-b border-gray-700 bg-gray-900 text-xl font-bold">
               # {selectedChannel.name}
             </div>
             <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-800/30">
@@ -326,9 +341,65 @@ export default function RoomChat() {
         )}
       </div>
 
+      {/* Mobile Sidebar Overlay */}
+      {openSidebar && (
+        <div className="fixed inset-0 z-50 bg-gray-900/70 backdrop-blur-2xl flex flex-col px-6 py-6">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-bold">📂 Channels</h2>
+            <button onClick={() => setOpenSidebar(false)}>
+              <X size={28} />
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto space-y-3">
+            {channels.map((ch) => (
+              <div
+                key={ch._id}
+                onClick={() => {
+                  setSelectedChannel(ch);
+                  setOpenSidebar(false);
+                }}
+                className={`p-3 rounded-lg cursor-pointer transition ${
+                  selectedChannel?._id === ch._id
+                    ? "bg-purple-600 text-white"
+                    : "hover:bg-gray-700"
+                }`}
+              >
+                # {ch.name}
+              </div>
+            ))}
+          </div>
+          <form onSubmit={createChannel} className="mt-6 space-y-2">
+            <input
+              type="text"
+              placeholder="New channel name"
+              value={newChannelName}
+              onChange={(e) => setNewChannelName(e.target.value)}
+              className="w-full p-2 rounded bg-gray-100 text-black focus:outline-none"
+            />
+            <button
+              type="submit"
+              className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg shadow"
+            >
+              ➕ Add Channel
+            </button>
+          </form>
+          {isAdmin && (
+            <button
+              onClick={() => {
+                setShowContestModal(true);
+                setOpenSidebar(false);
+              }}
+              className="mt-4 w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-lg shadow"
+            >
+              🏁 Create Contest
+            </button>
+          )}
+        </div>
+      )}
+
       {/* Contest Modal */}
       {showContestModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]">
           <div className="bg-gray-900 text-white p-6 rounded-2xl w-96 shadow-lg border border-gray-700">
             <h2 className="text-xl font-bold mb-4">Create Contest</h2>
             <form onSubmit={createContest} className="space-y-3">
