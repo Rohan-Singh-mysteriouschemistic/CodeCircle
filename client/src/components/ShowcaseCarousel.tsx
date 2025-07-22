@@ -10,19 +10,22 @@ const slides = [
     id: 1,
     image: dashboardMockup,
     title: "Room Dashboard",
-    caption: "Create rooms, sync stats, and stay on top of your coding community."
+    caption:
+      "Create rooms, sync stats, and stay on top of your coding community."
   },
   {
     id: 2,
     image: chatMockup,
     title: "Chat Channels",
-    caption: "Collaborate in real time with focused discussions for every room."
+    caption:
+      "Collaborate in real time with focused discussions for every room."
   },
   {
     id: 3,
     image: contestMockup,
-    title: "LeaderBoards",
-    caption: "Track rankings and performance with clear, insightful analytics."
+    title: "Leaderboards",
+    caption:
+      "Track rankings and performance with clear, insightful analytics."
   }
 ];
 
@@ -37,28 +40,24 @@ const ShowcaseCarousel = () => {
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
   };
 
-  const goToSlide = (index: number) => {
-    setCurrentSlide(index);
-  };
-
   return (
-    <section className="py-20">
+    <section className="py-16 sm:py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center mb-16">
-          <h2 className="text-4xl lg:text-5xl font-bold mb-4">
+        <div className="text-center mb-12 sm:mb-16">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 leading-tight">
             See It in <span className="gradient-text">Action</span>
           </h2>
-          <p className="text-xl text-[hsl(var(--muted-foreground))] max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg md:text-xl text-[hsl(var(--muted-foreground))] max-w-2xl mx-auto">
             Explore the powerful features that make CodeCircle Buddies the perfect platform for collaborative coding.
           </p>
         </div>
 
         {/* Carousel Container */}
         <div className="relative max-w-5xl mx-auto">
-          <div className="glass-card rounded-2xl p-6 overflow-hidden">
+          <div className="glass-card rounded-2xl p-4 sm:p-6 overflow-hidden">
             {/* Slides Container */}
-            <div className="relative h-96 md:h-[500px] rounded-xl overflow-hidden">
+            <div className="relative h-64 sm:h-80 md:h-[500px] rounded-xl overflow-hidden">
               {slides.map((slide, index) => (
                 <div
                   key={slide.id}
@@ -77,13 +76,13 @@ const ShowcaseCarousel = () => {
                   />
                   {/* Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent rounded-xl"></div>
-                  
+
                   {/* Slide Content */}
-                  <div className="absolute bottom-6 left-6 right-6">
-                    <h3 className="text-2xl font-bold text-white mb-2">
+                  <div className="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 right-4 sm:right-6">
+                    <h3 className="text-lg sm:text-2xl font-bold text-white mb-2">
                       {slide.title}
                     </h3>
-                    <p className="text-white/80 text-lg">
+                    <p className="text-white/80 text-sm sm:text-base md:text-lg">
                       {slide.caption}
                     </p>
                   </div>
@@ -96,17 +95,17 @@ const ShowcaseCarousel = () => {
               variant="ghost"
               size="sm"
               onClick={prevSlide}
-              className="absolute top-1/2 left-2 transform -translate-y-1/2 w-12 h-12 rounded-full bg-background/20 backdrop-blur-sm hover:bg-background/40 border border-border/20"
+              className="absolute top-1/2 left-2 sm:left-4 transform -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-background/30 backdrop-blur-sm hover:bg-background/50 border border-border/20"
             >
-              <ChevronLeft className="h-6 w-6 text-white" />
+              <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
             </Button>
             <Button
               variant="ghost"
               size="sm"
               onClick={nextSlide}
-              className="absolute top-1/2 right-2 transform -translate-y-1/2 w-12 h-12 rounded-full bg-background/20 backdrop-blur-sm hover:bg-background/40 border border-border/20"
+              className="absolute top-1/2 right-2 sm:right-4 transform -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-background/30 backdrop-blur-sm hover:bg-background/50 border border-border/20"
             >
-              <ChevronRight className="h-6 w-6 text-white" />
+              <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
             </Button>
           </div>
         </div>

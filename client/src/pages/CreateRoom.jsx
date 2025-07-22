@@ -2,13 +2,20 @@ import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Lightbulb, PlusCircle } from "lucide-react";
 
 export default function CreateRoom() {
   const { token } = useAuth();
   const [roomName, setRoomName] = useState("");
   const [message, setMessage] = useState("");
+  const [isError, setIsError] = useState(false);
 
   const handleCreate = async (e) => {
     e.preventDefault();
@@ -22,40 +29,51 @@ export default function CreateRoom() {
         body: JSON.stringify({ name: roomName }),
       });
       const data = await res.json();
-      if (!res.ok) return setMessage(data.message || "Error creating room");
+      if (!res.ok) {
+        setIsError(true);
+        return setMessage(data.message || "❌ Error creating room");
+      }
+      setIsError(false);
       setMessage(`✅ Room created! Invite code: ${data.room.inviteCode}`);
       setRoomName("");
     } catch (err) {
       console.error(err);
-      setMessage("Server error");
+      setIsError(true);
+      setMessage("❌ Server error. Please try again.");
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 text-gray-100 flex flex-col">
+      {/* spacing from navbar */}
       <div className="h-16" />
+
       {/* Hero Section */}
-      <section className="relative py-16 px-4 sm:px-6 lg:px-8 overflow-hidden text-center">
+      <section className="relative py-16 px-4 sm:px-6 lg:px-8 text-center overflow-hidden">
+        {/* Decorative background */}
         <div className="absolute -top-40 -right-40 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl"></div>
         <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl"></div>
         <div className="relative max-w-3xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Create Your <span className="gradient-text">Own Room</span></h1>
-          <p className="text-gray-400 text-lg">
-            Set up a new coding space, invite your friends, and start collaborating. 
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">
+            Create Your <span className="gradient-text">Own Room</span>
+          </h1>
+          <p className="text-gray-400 text-base sm:text-lg max-w-2xl mx-auto">
+            Set up a new coding space, invite your friends, and start collaborating.  
             As the creator, you’ll be the admin and can host contests!
           </p>
         </div>
       </section>
 
-      {/* Main Card */}
-      <section className="flex-grow flex flex-col items-center justify-start px-4 pb-12 space-y-8 mt-9">
-        <Card className="bg-gray-800/50 backdrop-blur border border-gray-700 shadow-lg w-full max-w-md">
+      {/* Main Content */}
+      <section className="flex-grow flex flex-col items-center justify-start px-4 pb-12 space-y-8 mt-6 sm:mt-10">
+        {/* Create Room Card */}
+        <Card className="bg-gray-800/50 backdrop-blur border border-gray-700 shadow-lg w-full max-w-md rounded-2xl">
           <CardHeader>
-            <CardTitle className="flex items-center text-2xl">
-              <PlusCircle className="h-7 w-7 mr-3 text-purple-400" />
+            <CardTitle className="flex items-center text-xl sm:text-2xl">
+              <PlusCircle className="h-6 w-6 sm:h-7 sm:w-7 mr-3 text-purple-400" />
               Create a New Room
             </CardTitle>
-            <CardDescription className="text-gray-400">
+            <CardDescription className="text-gray-400 mt-1">
               Set up your own coding space.
             </CardDescription>
           </CardHeader>
@@ -69,24 +87,36 @@ export default function CreateRoom() {
                 className="bg-gray-900 border-gray-700 focus:border-purple-400 focus:ring-purple-400"
                 required
               />
-              <Button type="submit" className="w-full bg-purple-500 hover:bg-purple-600 text-white transition-all duration-200">
+              <Button
+                type="submit"
+                className="w-full bg-purple-500 hover:bg-purple-600 text-white transition-all duration-200"
+              >
                 Create Room
               </Button>
             </form>
-            {message && <p className="mt-4 text-sm text-green-400">{message}</p>}
+
+            {message && (
+              <p
+                className={`mt-4 text-sm text-center font-medium ${
+                  isError ? "text-red-400" : "text-green-400"
+                }`}
+              >
+                {message}
+              </p>
+            )}
           </CardContent>
         </Card>
 
-        {/* Pro Tip Section */}
-        <Card className="bg-blue-500/10 border border-blue-500/30 w-full rounded-lg">
-          <CardContent className="p-6 flex items-center justify-center sm:justify-start space-x-4 max-w-7xl mx-auto">
-            <div className="p-3 bg-blue-500/20 rounded-full">
+        {/* Pro Tip */}
+        <Card className="bg-blue-500/10 border border-blue-500/30 w-full max-w-3xl rounded-2xl">
+          <CardContent className="p-6 flex flex-col sm:flex-row items-center sm:items-start sm:space-x-4 text-center sm:text-left">
+            <div className="p-3 bg-blue-500/20 rounded-full mb-4 sm:mb-0">
               <Lightbulb className="h-6 w-6 text-blue-400" />
             </div>
-            <div className="text-center sm:text-left">
+            <div>
               <h3 className="font-semibold mb-1 text-lg">Pro Tip</h3>
-              <p className="text-gray-300 text-sm">
-                As the room creator, you’re the admin. You can organize contests, manage members, and lead collaborative coding sessions.
+              <p className="text-gray-300 text-sm leading-relaxed">
+                As the room creator, you’re the admin. You can organize contests and lead collaborative coding sessions.
               </p>
             </div>
           </CardContent>

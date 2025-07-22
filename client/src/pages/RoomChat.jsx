@@ -1,15 +1,15 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Menu, X } from "lucide-react";
 import io from "socket.io-client";
 
-const socket = io("http://localhost:5000");
-
 export default function RoomChat() {
   const { roomId } = useParams();
   const { token, user } = useAuth();
   const messagesEndRef = useRef(null);
+
+  const [socket, setSocket] = useState(null);
 
   const [channels, setChannels] = useState([]);
   const [newChannelName, setNewChannelName] = useState("");
@@ -29,7 +29,19 @@ export default function RoomChat() {
 
   const [openSidebar, setOpenSidebar] = useState(false);
 
-  // fetch channels & admin
+  // ✅ create socket & cleanup
+  useEffect(() => {
+    if (!token) return;
+    const s = io("http://localhost:5000", {
+      auth: { token },
+    });
+    setSocket(s);
+    return () => {
+      s.disconnect();
+    };
+  }, [token]);
+
+  // ✅ fetch channels & admin
   useEffect(() => {
     if (!token || !user?.id) return;
     async function fetchChannels() {
@@ -66,7 +78,7 @@ export default function RoomChat() {
     checkAdmin();
   }, [roomId, token, user]);
 
-  // fetch active contest
+  // ✅ fetch active contest
   useEffect(() => {
     async function fetchContest() {
       try {
@@ -81,17 +93,18 @@ export default function RoomChat() {
         setActiveContest(null);
       }
     }
-    fetchContest();
+    if (token) fetchContest();
   }, [roomId, token]);
 
-  // scroll to bottom
+  // ✅ scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // fetch messages
+  // ✅ fetch messages and join channel
   useEffect(() => {
-    if (!selectedChannel) return;
+    if (!selectedChannel || !socket) return;
+
     async function fetchMessages() {
       try {
         const res = await fetch(
@@ -107,10 +120,19 @@ export default function RoomChat() {
       }
     }
     fetchMessages();
-    socket.emit("joinChannel", { roomId, channelId: selectedChannel._id });
-  }, [selectedChannel, roomId, token]);
 
+    // join channel
+    socket.emit("joinChannel", { roomId, channelId: selectedChannel._id });
+
+    // ✅ leave previous on cleanup
+    return () => {
+      socket.emit("leaveChannel", { roomId, channelId: selectedChannel._id });
+    };
+  }, [selectedChannel, roomId, token, socket]);
+
+  // ✅ handle incoming messages
   useEffect(() => {
+    if (!socket) return;
     const handler = (msg) => {
       if (msg.channelId === selectedChannel?._id) {
         setMessages((prev) => [...prev, msg]);
@@ -118,30 +140,35 @@ export default function RoomChat() {
     };
     socket.on("receiveMessage", handler);
     return () => socket.off("receiveMessage", handler);
-  }, [selectedChannel]);
+  }, [socket, selectedChannel]);
 
-  async function createChannel(e) {
-    e.preventDefault();
-    if (!newChannelName.trim()) return;
-    const res = await fetch(`http://localhost:5000/api/channels/create`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ name: newChannelName, roomId }),
-    });
-    const data = await res.json();
-    if (res.ok) {
-      setChannels((prev) => [...prev, data]);
-      setNewChannelName("");
-    } else {
-      alert(data.message || "Failed to create channel");
-    }
-  }
+  // ✅ create channel
+  const createChannel = useCallback(
+    async (e) => {
+      e.preventDefault();
+      if (!newChannelName.trim()) return;
+      const res = await fetch(`http://localhost:5000/api/channels/create`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ name: newChannelName, roomId }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setChannels((prev) => [...prev, data]);
+        setNewChannelName("");
+      } else {
+        console.warn(data.message || "Failed to create channel");
+      }
+    },
+    [newChannelName, roomId, token]
+  );
 
-  function sendMessage() {
-    if (!messageText.trim() || !selectedChannel) return;
+  // ✅ send message
+  const sendMessage = useCallback(() => {
+    if (!messageText.trim() || !selectedChannel || !socket) return;
     socket.emit("sendMessage", {
       text: messageText,
       sender: user.id,
@@ -149,57 +176,70 @@ export default function RoomChat() {
       channelId: selectedChannel._id,
     });
     setMessageText("");
-  }
+  }, [messageText, selectedChannel, socket, user, roomId]);
 
-  async function createContest(e) {
-    e.preventDefault();
-    try {
-      const res = await fetch(`http://localhost:5000/api/contests/${roomId}/create`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ problems }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        alert("✅ Contest created!");
-        setShowContestModal(false);
-        setActiveContest(data);
-      } else {
-        alert(data.message || "Failed to create contest");
+  // ✅ create contest
+  const createContest = useCallback(
+    async (e) => {
+      e.preventDefault();
+      if (problems.some((p) => !p.title || !p.url || !p.difficulty)) {
+        alert("❌ Please fill all problem fields.");
+        return;
       }
-    } catch (err) {
-      console.error(err);
-    }
-  }
-
-  async function submitSolved(contestId, problemIndex) {
-    try {
-      const res = await fetch(`http://localhost:5000/api/contests/${contestId}/submit`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ problemIndex }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        alert("✅ Marked as solved!");
-        setActiveContest(data.contest); // update solved state
-      } else {
-        alert(data.message || "❌ Failed to mark solved");
+      try {
+        const res = await fetch(`http://localhost:5000/api/contests/${roomId}/create`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ problems }),
+        });
+        const data = await res.json();
+        if (res.ok) {
+          alert("✅ Contest created!");
+          setShowContestModal(false);
+          setActiveContest(data);
+        } else {
+          alert(data.message || "Failed to create contest");
+        }
+      } catch (err) {
+        console.error(err);
       }
-    } catch (err) {
-      console.error(err);
-    }
-  }
+    },
+    [problems, roomId, token]
+  );
 
+  // ✅ mark solved
+  const submitSolved = useCallback(
+    async (contestId, problemIndex) => {
+      try {
+        const res = await fetch(`http://localhost:5000/api/contests/${contestId}/submit`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ problemIndex }),
+        });
+        const data = await res.json();
+        if (res.ok) {
+          alert("✅ Marked as solved!");
+          setActiveContest(data.contest);
+        } else {
+          alert(data.message || "❌ Failed to mark solved");
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    [token]
+  );
+
+  // ✅ render
   return (
     <div className="flex h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 text-gray-100">
-      {/* ✅ SIDEBAR */}
+      {/* SIDEBAR */}
       <div className="hidden md:flex w-64 bg-gray-800/60 backdrop-blur border-r border-gray-700 p-4 flex-col">
         <h2 className="text-xl font-bold mb-4">📂 Channels</h2>
         <ul className="space-y-2 flex-1 overflow-y-auto">
@@ -242,7 +282,7 @@ export default function RoomChat() {
         )}
       </div>
 
-      {/* ✅ Main Chat Area */}
+      {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
         {/* mobile top bar */}
         <div className="md:hidden flex justify-between items-center p-3 border-b border-gray-700 bg-gray-900">
@@ -346,7 +386,7 @@ export default function RoomChat() {
         )}
       </div>
 
-      {/* ✅ Mobile Sidebar Overlay */}
+      {/* Mobile Sidebar Overlay */}
       {openSidebar && (
         <div className="fixed inset-0 z-50 bg-gray-900/70 backdrop-blur-2xl flex flex-col px-6 py-6">
           <div className="flex justify-between items-center mb-6">
@@ -402,7 +442,7 @@ export default function RoomChat() {
         </div>
       )}
 
-      {/* ✅ Contest Modal (unchanged) */}
+      {/* Contest Modal */}
       {showContestModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]">
           <div className="bg-gray-900 text-white p-6 rounded-2xl w-96 shadow-lg border border-gray-700">

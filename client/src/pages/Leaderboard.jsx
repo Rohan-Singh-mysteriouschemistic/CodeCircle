@@ -1,22 +1,42 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 
 export default function Leaderboard() {
   const { roomId } = useParams();
   const [members, setMembers] = useState([]);
   const [roomName, setRoomName] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch(`http://localhost:5000/api/leetcode/room-leaderboard/${roomId}`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-    })
-      .then((res) => res.json())
-      .then((data) => {
+    const fetchLeaderboard = async () => {
+      try {
+        const res = await fetch(
+          `http://localhost:5000/api/leetcode/room-leaderboard/${roomId}`,
+          {
+            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+          }
+        );
+        const data = await res.json();
+        if (!res.ok) {
+          setError(data.message || "Failed to load leaderboard");
+          return;
+        }
+        // Sort by totalSolved descending
+        const sorted = (data.members || []).sort(
+          (a, b) => b.totalSolved - a.totalSolved
+        );
+        setMembers(sorted);
         setRoomName(data.roomName || "");
-        setMembers(data.members || []);
-      })
-      .catch((err) => console.error(err));
+      } catch (err) {
+        console.error(err);
+        setError("Network error while fetching leaderboard");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchLeaderboard();
   }, [roomId]);
 
   return (
@@ -30,7 +50,8 @@ export default function Leaderboard() {
             Room <span className="gradient-text">Leaderboard</span>
           </h1>
           <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-            Track the performance of all members in <span className="text-purple-400 font-semibold">{roomName}</span>.
+            Track the performance of all members in{" "}
+            <span className="text-purple-400 font-semibold">{roomName}</span>.
           </p>
         </div>
       </section>
@@ -39,40 +60,57 @@ export default function Leaderboard() {
       <section className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <Card className="bg-gray-800/50 backdrop-blur border border-gray-700 rounded-2xl overflow-hidden">
-            <CardHeader>
-            </CardHeader>
-            <CardContent className="overflow-x-auto">
-              <table className="min-w-full text-left text-gray-200">
-                <thead>
-                  <tr className="border-b border-gray-700">
-                    <th className="py-3 px-4">Username</th>
-                    <th className="py-3 px-4">Solved</th>
-                    <th className="py-3 px-4">Contest Rating</th>
-                    <th className="py-3 px-4">Rank</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {members.length === 0 ? (
-                    <tr>
-                      <td colSpan="4" className="py-6 text-center text-gray-400">
-                        No members found.
-                      </td>
+            <CardContent className="overflow-x-auto p-0">
+              {loading ? (
+                <div className="p-6 text-center text-gray-400">Loading leaderboard…</div>
+              ) : error ? (
+                <div className="p-6 text-center text-red-400">{error}</div>
+              ) : (
+                <table className="min-w-full text-left text-gray-200">
+                  <thead>
+                    <tr className="border-b border-gray-700 bg-gray-800">
+                      <th className="py-3 px-4">#</th>
+                      <th className="py-3 px-4">Username</th>
+                      <th className="py-3 px-4">Solved</th>
+                      <th className="py-3 px-4">Contest Rating</th>
+                      <th className="py-3 px-4">Rank</th>
                     </tr>
-                  ) : (
-                    members.map((m, i) => (
-                      <tr
-                        key={i}
-                        className="border-b border-gray-700 hover:bg-gray-700/30 transition-colors"
-                      >
-                        <td className="py-3 px-4 font-medium">{m.username}</td>
-                        <td className="py-3 px-4">{m.totalSolved}</td>
-                        <td className="py-3 px-4">{m.contestRating}</td>
-                        <td className="py-3 px-4">{m.globalRank ?? "-"}</td>
+                  </thead>
+                  <tbody>
+                    {members.length === 0 ? (
+                      <tr>
+                        <td
+                          colSpan="5"
+                          className="py-6 text-center text-gray-400"
+                        >
+                          No members found.
+                        </td>
                       </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
+                    ) : (
+                      members.map((m, i) => (
+                        <tr
+                          key={i}
+                          className={`border-b border-gray-700 hover:bg-gray-700/30 transition-colors ${
+                            i === 0
+                              ? "bg-yellow-500/10"
+                              : i === 1
+                              ? "bg-gray-500/10"
+                              : i === 2
+                              ? "bg-orange-500/10"
+                              : ""
+                          }`}
+                        >
+                          <td className="py-3 px-4 font-semibold">{i + 1}</td>
+                          <td className="py-3 px-4 font-medium">{m.username}</td>
+                          <td className="py-3 px-4">{m.totalSolved}</td>
+                          <td className="py-3 px-4">{m.contestRating}</td>
+                          <td className="py-3 px-4">{m.globalRank ?? "-"}</td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              )}
             </CardContent>
           </Card>
         </div>

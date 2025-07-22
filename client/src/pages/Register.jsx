@@ -17,6 +17,7 @@ export default function Register() {
       setError("Passwords do not match");
       return;
     }
+    setError(""); // clear previous errors
     setLoading(true);
     try {
       await axios.post("http://localhost:5000/api/users/register", {
@@ -34,7 +35,7 @@ export default function Register() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 text-gray-100 flex flex-col">
-      {/* ✅ Hero section styled same as Login page */}
+      {/* ✅ Hero section */}
       <section className="relative py-16 px-4 sm:px-6 lg:px-8 overflow-hidden text-center">
         <div className="absolute -top-40 -right-40 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl"></div>
         <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl"></div>
@@ -48,9 +49,9 @@ export default function Register() {
         </div>
       </section>
 
-      {/* ✅ Register Card styled same as Login card */}
-      <section className="flex-grow flex flex-col items-center justify-start px-4 pb-12 space-y-8 mt-9">
-        <div className="z-10 w-full max-w-md mt-10 p-8 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-[0_0_20px_rgba(0,0,0,0.4)]">
+      {/* ✅ Register Card */}
+      <section className="flex-grow flex flex-col items-center justify-start px-4 pb-12 mt-9">
+        <div className="z-10 w-full max-w-md mt-4 sm:mt-10 p-6 sm:p-8 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-[0_0_20px_rgba(0,0,0,0.4)]">
           <form onSubmit={handleSubmit} className="space-y-4">
             <input
               type="text"
@@ -58,13 +59,15 @@ export default function Register() {
               className="w-full px-4 py-3 rounded-lg border border-gray-300 text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
+              required
             />
             <input
               type="email"
-              placeholder="Email"
+              placeholder="User-Id"
               className="w-full px-4 py-3 rounded-lg border border-gray-300 text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
             />
             <input
               type="password"
@@ -72,13 +75,15 @@ export default function Register() {
               className="w-full px-4 py-3 rounded-lg border border-gray-300 text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              required
             />
             <input
               type="password"
               placeholder="Confirm Password"
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors"
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors"
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
+              required
             />
             {error && <p className="text-red-500">{error}</p>}
             <button
