@@ -7,15 +7,15 @@ import Message from "./models/Message.js";
 import Contest from "./models/Contest.js";
 import User from "./models/User.js";
 
-// ✅ Connect to MongoDB
+//  Connect to MongoDB
 connectDB();
 
 const PORT = process.env.PORT || 5000;
 
-// ✅ Create HTTP server
+//  Create HTTP server
 const server = http.createServer(app);
 
-// ✅ Initialize Socket.IO with CORS
+//  Initialize Socket.IO with CORS
 const io = new Server(server, {
   cors: {
     origin: "http://localhost:5173", // frontend URL
@@ -27,12 +27,12 @@ const io = new Server(server, {
 console.log("✅ Socket.IO initialized");
 
 // ======================
-// 📌 Socket.IO Handling
+//  Socket.IO Handling
 // ======================
 io.on("connection", (socket) => {
   console.log(`🔗 New socket connected: ${socket.id}`);
 
-  // 👉 Join a channel inside a room
+  //  Join a channel inside a room
   socket.on("joinChannel", ({ roomId, channelId }) => {
     if (!roomId || !channelId) {
       console.warn("⚠️ joinChannel missing roomId or channelId");
@@ -42,7 +42,7 @@ io.on("connection", (socket) => {
     console.log(`➡️ Socket ${socket.id} joined channel ${channelId} (room: ${roomId})`);
   });
 
-  // 👉 Send message event
+  //  Send message event
   socket.on("sendMessage", async (msgData) => {
     try {
       const { text, sender, roomId, channelId } = msgData || {};
@@ -75,14 +75,14 @@ io.on("connection", (socket) => {
     }
   });
 
-  // 👉 Handle disconnect
+  //  Handle disconnect
   socket.on("disconnect", () => {
     console.log(`❌ Socket disconnected: ${socket.id}`);
   });
 });
 
 // ======================
-// 📌 Auto-finish contests
+//  Auto-finish contests
 // ======================
 
 // Helper to award badges and mark finished
@@ -131,7 +131,7 @@ setInterval(async () => {
 }, 60 * 1000);
 
 // ======================
-// 📌 Start server
+//  Start server
 // ======================
 server.listen(PORT, () => {
   console.log(`🚀 Server with Socket.IO running on port ${PORT}`);
