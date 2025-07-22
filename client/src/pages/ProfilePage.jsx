@@ -1,5 +1,5 @@
-// src/pages/ProfilePage.jsx
 import { useState } from "react";
+import API_BASE from "../config.js";
 import { useAuth } from "../context/AuthContext";
 import { User } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -31,7 +31,7 @@ export default function ProfilePage() {
     setMessage("");
 
     try {
-      const res = await fetch("http://localhost:5000/api/leetcode/update", {
+      const res = await fetch(`${API_BASE}/api/leetcode/update`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -47,7 +47,7 @@ export default function ProfilePage() {
         setMessage(`✅ LeetCode synced successfully for ${leetCodeId}`);
 
         // refresh profile
-        const meRes = await fetch("http://localhost:5000/api/auth/me", {
+        const meRes = await fetch(`${API_BASE}/api/auth/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const freshUser = await meRes.json();

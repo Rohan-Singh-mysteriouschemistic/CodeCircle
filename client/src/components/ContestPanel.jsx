@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-
+import API_BASE from "../config.js";
 export default function ContestPanel({ roomId, token, user }) {
   const [activeContest, setActiveContest] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -12,7 +12,7 @@ export default function ContestPanel({ roomId, token, user }) {
   // fetch active contest & admin
   useEffect(() => {
     async function fetchContest() {
-      const res = await fetch(`http://localhost:5000/api/contests/${roomId}/active`, {
+      const res = await fetch(`${API_BASE}/api/contests/${roomId}/active`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -21,7 +21,7 @@ export default function ContestPanel({ roomId, token, user }) {
     }
 
     async function checkAdmin() {
-      const res = await fetch(`http://localhost:5000/api/rooms/${roomId}`, {
+      const res = await fetch(`${API_BASE}/api/rooms/${roomId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -49,7 +49,7 @@ export default function ContestPanel({ roomId, token, user }) {
 
   async function createContest(e) {
     e.preventDefault();
-    const res = await fetch(`http://localhost:5000/api/contests/${roomId}/create`, {
+    const res = await fetch(`${API_BASE}/api/contests/${roomId}/create`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -67,7 +67,7 @@ export default function ContestPanel({ roomId, token, user }) {
   }
 
   async function submitSolved(contestId, problemIndex) {
-    const res = await fetch(`http://localhost:5000/api/contests/${contestId}/submit`, {
+    const res = await fetch(`${API_BASE}/api/contests/${contestId}/submit`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import API_BASE from "../config.js";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -21,7 +22,7 @@ export default function JoinRoom() {
   const handleJoin = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:5000/api/rooms/join", {
+      const res = await fetch(`${API_BASE}/api/rooms/join`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

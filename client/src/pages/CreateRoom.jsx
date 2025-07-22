@@ -1,4 +1,5 @@
 import { useState } from "react";
+import API_BASE from "../config.js";
 import { useAuth } from "../context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,7 +21,7 @@ export default function CreateRoom() {
   const handleCreate = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:5000/api/rooms/create", {
+      const res = await fetch(`${API_BASE}/api/rooms/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

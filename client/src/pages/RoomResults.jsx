@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import API_BASE from "../config.js";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -18,7 +19,7 @@ export default function RoomResults() {
       setError("");
       try {
         const res = await fetch(
-          `http://localhost:5000/api/contests/${roomId}/latest`,
+          `${API_BASE}/api/contests/${roomId}/latest`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 

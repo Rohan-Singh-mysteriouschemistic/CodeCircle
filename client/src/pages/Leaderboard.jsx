@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import API_BASE from "../config.js";
 import { useParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -13,7 +14,7 @@ export default function Leaderboard() {
     const fetchLeaderboard = async () => {
       try {
         const res = await fetch(
-          `http://localhost:5000/api/leetcode/room-leaderboard/${roomId}`,
+          `${API_BASE}/api/leetcode/room-leaderboard/${roomId}`,
           {
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
           }

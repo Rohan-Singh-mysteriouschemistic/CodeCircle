@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import API_BASE from "../config.js";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import {
@@ -18,7 +19,7 @@ export default function Rooms() {
 
   useEffect(() => {
     if (!token) return;
-    fetch("http://localhost:5000/api/rooms/my-rooms", {
+    fetch(`${API_BASE}/api/rooms/my-rooms`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

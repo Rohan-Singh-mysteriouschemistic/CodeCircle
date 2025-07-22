@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from "react";
+import API_BASE from "../config.js";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Menu, X } from "lucide-react";
@@ -32,7 +33,7 @@ export default function RoomChat() {
   // ✅ create socket & cleanup
   useEffect(() => {
     if (!token) return;
-    const s = io("http://localhost:5000", {
+    const s = io(`${API_BASE}`, {
       auth: { token },
     });
     setSocket(s);
@@ -47,7 +48,7 @@ export default function RoomChat() {
     async function fetchChannels() {
       try {
         const res = await fetch(
-          `http://localhost:5000/api/channels/${roomId}/channels`,
+          `${API_BASE}/api/channels/${roomId}/channels`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         const data = await res.json();
@@ -59,7 +60,7 @@ export default function RoomChat() {
 
     async function checkAdmin() {
       try {
-        const res = await fetch(`http://localhost:5000/api/rooms/${roomId}`, {
+        const res = await fetch(`${API_BASE}/api/rooms/${roomId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
@@ -82,7 +83,7 @@ export default function RoomChat() {
   useEffect(() => {
     async function fetchContest() {
       try {
-        const res = await fetch(`http://localhost:5000/api/contests/${roomId}/active`, {
+        const res = await fetch(`${API_BASE}/api/contests/${roomId}/active`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
@@ -108,7 +109,7 @@ export default function RoomChat() {
     async function fetchMessages() {
       try {
         const res = await fetch(
-          `http://localhost:5000/api/messages/${selectedChannel._id}`,
+          `${API_BASE}/api/messages/${selectedChannel._id}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         const data = await res.json();
@@ -147,7 +148,7 @@ export default function RoomChat() {
     async (e) => {
       e.preventDefault();
       if (!newChannelName.trim()) return;
-      const res = await fetch(`http://localhost:5000/api/channels/create`, {
+      const res = await fetch(`${API_BASE}/api/channels/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -187,7 +188,7 @@ export default function RoomChat() {
         return;
       }
       try {
-        const res = await fetch(`http://localhost:5000/api/contests/${roomId}/create`, {
+        const res = await fetch(`${API_BASE}/api/contests/${roomId}/create`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -214,7 +215,7 @@ export default function RoomChat() {
   const submitSolved = useCallback(
     async (contestId, problemIndex) => {
       try {
-        const res = await fetch(`http://localhost:5000/api/contests/${contestId}/submit`, {
+        const res = await fetch(`${API_BASE}/api/contests/${contestId}/submit`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

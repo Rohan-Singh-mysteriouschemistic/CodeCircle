@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-
+import API_BASE from "../config.js";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -9,7 +9,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     if (token) {
       // Validate token with backend
-      fetch("http://localhost:5000/api/auth/me", {
+      fetch(`${API_BASE}/api/auth/me`, {
         headers: { Authorization: `Bearer ${token}` },
       })
         .then((res) => {
