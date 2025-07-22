@@ -9,7 +9,7 @@ export default function ContestPanel({ roomId, token, user }) {
     { title: "", url: "", difficulty: "" },
   ]);
 
-  // ✅ fetch active contest & admin
+  // fetch active contest & admin
   useEffect(() => {
     async function fetchContest() {
       const res = await fetch(`http://localhost:5000/api/contests/${roomId}/active`, {

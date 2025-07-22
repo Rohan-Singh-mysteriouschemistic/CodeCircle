@@ -12,7 +12,7 @@ function extractSlugFromUrl(url) {
   return match ? match[1] : "";
 }
 
-// ✅ Create contest
+// Create contest
 contestRoute.post("/:roomId/create", protect, isAdmin, async (req, res) => {
   try {
     const { problems } = req.body;
@@ -43,7 +43,7 @@ contestRoute.post("/:roomId/create", protect, isAdmin, async (req, res) => {
   }
 });
 
-// ✅ Get active contest
+// Get active contest
 contestRoute.get("/:roomId/active", protect, async (req, res) => {
   try {
     const now = new Date();
@@ -59,7 +59,7 @@ contestRoute.get("/:roomId/active", protect, async (req, res) => {
   }
 });
 
-// ✅ Submit problem
+// Submit problem
 contestRoute.post("/:contestId/submit", protect, async (req, res) => {
   try {
     const { problemIndex } = req.body;
@@ -129,7 +129,7 @@ contestRoute.post("/:contestId/submit", protect, async (req, res) => {
   }
 });
 
-// ✅ Finish contest and update badges
+// Finish contest and update badges
 contestRoute.post("/:contestId/finish", protect, isAdmin, async (req, res) => {
   try {
     const { contestId } = req.params;
@@ -172,7 +172,7 @@ contestRoute.post("/:contestId/finish", protect, isAdmin, async (req, res) => {
   }
 });
 
-// ✅ Get latest finished contest
+// Get latest finished contest
 contestRoute.get("/:roomId/latest", protect, async (req, res) => {
   try {
     const now = new Date();

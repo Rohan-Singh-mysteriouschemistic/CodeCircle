@@ -3,7 +3,6 @@
 @tailwind utilities;
 
 /* CodeCircle Buddies Design System - Modern Dark Theme with Glassmorphism */
-/* All colors MUST be HSL. */
 
 @layer base {
   :root {

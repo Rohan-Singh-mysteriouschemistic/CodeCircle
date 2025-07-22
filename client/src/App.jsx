@@ -17,9 +17,9 @@ import RoomResults from "./pages/RoomResults.jsx";
 export default function App() {
   const location = useLocation();
 
-  // 👇 Define paths where Navbar should be hidden
+  // Define paths where Navbar should be hidden
   const noNavbarRoutes = ["/login", "/register"];
-  // 👇 Define paths where Footer should be hidden
+  // Define paths where Footer should be hidden
   const noFooterRoutes = ["/login", "/register"];
   const isRoomChat = location.pathname.startsWith("/rooms/") && location.pathname.endsWith("/chat");
 
@@ -28,7 +28,7 @@ export default function App() {
 
   return (
     <>
-      {/* ✅ Conditionally render Navbar */}
+      {/* Conditionally render Navbar */}
       {!hideNavbar && <Navbar />}
 
       <Routes>
@@ -107,7 +107,7 @@ export default function App() {
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
 
-      {/* ✅ Conditionally render Footer */}
+      {/* Conditionally render Footer */}
       {!hideFooter && <Footer />}
     </>
   );

@@ -19,7 +19,7 @@ router.get("/me", async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // ✅ Include badges in the response
+    // Include badges in the response
     res.json({
       id: user._id,
       username: user.username,

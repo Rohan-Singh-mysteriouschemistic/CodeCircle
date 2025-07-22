@@ -5,7 +5,7 @@ import Room from "../models/Room.js";
 
 const channelRoutes = express.Router();
 
-// ✅ Get all channels in a room
+// Get all channels in a room
 channelRoutes.get("/:roomId/channels", protect, async (req, res) => {
   try {
     const { roomId } = req.params;
@@ -24,7 +24,7 @@ channelRoutes.get("/:roomId/channels", protect, async (req, res) => {
   }
 });
 
-// ✅ Create a channel in a room
+// Create a channel in a room
 channelRoutes.post("/create", protect, async (req, res) => {
   try {
     const { name, roomId } = req.body;

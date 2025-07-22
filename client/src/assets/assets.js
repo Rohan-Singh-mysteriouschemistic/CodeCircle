@@ -1,5 +1,3 @@
-// src/assets/assets.js
-
 import dashboard from "./dashboard.png";
 import chatroom from "./chatroom.png";
 import contest from "./contest.png";
