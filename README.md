@@ -519,7 +519,7 @@ Currently, the project is structured for manual validation. For production relea
 
 ## 👤 Author
 
-*   **Rohan Singh** - *Creator & Lead Maintainer* - [GitHub](https://github.com/rohan-singh)
+*   **Rohan Singh** - *Creator & Lead Maintainer* - [GitHub](https://github.com/Rohan-Singh-mysteriouschemistic)
 
 ---
 *Created as a portfolio piece showing full-stack system design, WebSocket networking, and third-party API parsing.*
