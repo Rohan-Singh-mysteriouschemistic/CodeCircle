@@ -4,7 +4,6 @@
 [![React Version](https://img.shields.io/badge/react-%5E19.1.0-blue.svg)](https://react.dev/)
 [![Mongoose Version](https://img.shields.io/badge/mongoose-%5E8.16.4-green.svg)](https://mongoosejs.com/)
 [![Socket.IO Version](https://img.shields.io/badge/socket.io-%5E4.8.1-black.svg)](https://socket.io/)
-[![License: ISC](https://img.shields.io/badge/License-ISC-yellow.svg)](https://opensource.org/licenses/ISC)
 
 CodeCircle is a production-ready, real-time collaborative coding platform designed for competitive programmers, interview prep groups, and coding communities. It allows developers to create synchronized private rooms, chat across multiple channels, view live room leaderboards, and compete in mock coding contests where progress is verified programmatically and automatically using LeetCode's public GraphQL API.
 
